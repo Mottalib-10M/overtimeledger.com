@@ -4,6 +4,7 @@ import type { Helpers } from './page-types';
 import { formatNumber } from './format';
 import { KIT } from './kit';
 import { P } from './data';
+import { PLANNED } from './planned';
 
 const esc = (s: string | number) => String(s).replace(/&(?!(?:[a-z]+|#\d+);)/g, '&amp;').replace(/</g, '&lt;');
 export const SOURCES: Record<string, { url: string; label: string }> = (P as unknown as { sources: Record<string, { url: string; label: string }> }).sources;
@@ -14,7 +15,7 @@ export function table(headers: string[], rows: Array<Array<string | number>>, ca
 }
 export const ext = (url: string, text: string) => `<a href="${url}" target="_blank" rel="nofollow noopener noreferrer">${text}</a>`;
 export function link(id: string, text: string) {
-  if (!ROUTES.some((r) => r.id === id)) { if (process.env.VITEST) throw new Error(`Unknown page id in link: ${id}`); return text; }
+  if (!ROUTES.some((r) => r.id === id)) { if (process.env.PLANNED && PLANNED.includes(id)) return `<a href="/en/${id}/">${text}</a>`; if (process.env.VITEST) throw new Error(`Unknown page id in link: ${id}`); return text; }
   return `<a href="${route(id, 'en')}">${text}</a>`;
 }
 export const box = (title: string, html: string) => `<aside class="boxnote not-prose"><p class="boxnote-title">${title}</p><div class="text-navy-800">${html}</div></aside>`;

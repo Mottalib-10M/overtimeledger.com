@@ -9,6 +9,7 @@ import { HOME } from '../src/content/home';
 import { helpers, SOURCES } from '../src/lib/helpers';
 import { MINIS } from '../src/lib/mini-specs';
 import { ROUTES } from '../src/i18n/routes';
+import { PLANNED } from '../src/lib/planned';
 
 const only = (process.env.PAGE_FILES ?? '').split(',').filter(Boolean);
 const pages = only.length ? PAGES.filter((p) => only.includes(p.id)) : PAGES;
@@ -17,7 +18,7 @@ const BANNED = [/—/, /–/, /&mdash;/, /&ndash;/, /it[’']s important to note
 const allQ = [...HOME.faqs.map((f) => f.q), ...PAGES.flatMap((p) => p.faqs.map((f) => f.q))];
 const allTitles = [HOME.title, ...PAGES.map((p) => p.title)];
 const allDesc = [HOME.description, ...PAGES.map((p) => p.description)];
-const ids = new Set(ROUTES.map((r) => r.id));
+const ids = new Set([...ROUTES.map((r) => r.id), ...(process.env.PLANNED ? PLANNED : [])]);
 const h = helpers();
 const snippet = (title: string, description: string) => {
   expect(title.length, title).toBeGreaterThanOrEqual(50); expect(title.length, title).toBeLessThanOrEqual(60);

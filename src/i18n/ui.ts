@@ -9,6 +9,6 @@ const en = {
   footerPopular: 'States with daily overtime',
   notFound: 'This address leads nowhere on the site. The weekly time card is one click away, with breaks, quarter-hour rounding and overtime for California, Alaska, Nevada, Colorado and the federal rule.',
   readMore: 'Read the full answer',
-  estimate: 'Hours and gross pay before taxes and deductions. The overtime split follows the federal rule or the state rule you pick; union contracts, alternative workweek schedules, exemptions and local ordinances can change it. Check your pay stub against your employer’s written workweek.',
+  estimate: 'Estimate only, not legal advice: hours and gross pay before taxes and deductions. The overtime split follows the federal rule or the state rule you pick; union contracts, alternative workweek schedules, exemptions and local ordinances can change it. Check your pay stub against your employer’s written workweek.',
 };
 export function t(_lang: Locale) { return en; }
