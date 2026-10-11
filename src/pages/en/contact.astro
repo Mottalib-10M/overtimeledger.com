@@ -1,0 +1,26 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import LegalIdentity from '../../components/LegalIdentity.astro';
+import { CONTACT_EMAIL } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { contactPageSchema } from '../../lib/seo';
+const lang = 'en';
+const path = route('contact', lang);
+const description = 'Write to the publisher of Hours Ledger about an overtime rule, a source or a calculator result. We check rules against the official text; we do not give legal advice on a wage claim.';
+---
+<PageLayout title="Contact Hours Ledger: rule corrections, sources and embed questions" description={description} lang={lang} noindex={true} jsonLd={[contactPageSchema({ name: 'Contact', description, path, lang })]} breadcrumbs={[{ label: 'Contact' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none prose-headings:font-serif">
+    <h1>Contact</h1>
+    <p>E-mail: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. There is no form on purpose: your hours and pay are your business, and an e-mail lets you choose what to share.</p>
+    <h2>What we can help with</h2>
+    <ul>
+      <li>A result that looks wrong: send the share link of the time card (it contains the times you typed, nothing else) and tell us what payroll paid. We check the rule we applied against the source.</li>
+      <li>A change in a state wage order, a new COMPS Order or a minimum wage update we have not caught yet.</li>
+      <li>Embedding the time card or the military time converter on your own site: see the <a href={route('widget', lang)}>embed page</a> first.</li>
+    </ul>
+    <h2>What we cannot do</h2>
+    <p>We cannot say whether your employer owes you money, whether you are exempt or how to file a claim: that is the role of the Department of Labor's Wage and Hour Division, your state labor agency or a lawyer. The <a href={route('method', lang)}>method page</a> shows exactly how the hours are counted, which helps when you talk to payroll.</p>
+    <h2>Publisher</h2>
+    <LegalIdentity lang={lang} />
+  </div>
+</PageLayout>

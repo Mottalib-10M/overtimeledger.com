@@ -1,0 +1,40 @@
+---
+/**
+ * Renders the calculator of a page as a hydrated island, with the rules it needs from params-2026.json
+ * (prepared server side by lib/data.ts). `state` preselects or, with `lock`, fixes the overtime rule.
+ */
+import TimeCard from './calc/TimeCard';
+import HoursCalc from './calc/HoursCalc';
+import WorkHoursCalc from './calc/WorkHoursCalc';
+import TimeSumCalc from './calc/TimeSumCalc';
+import PunchCalc from './calc/PunchCalc';
+import DurationCalc from './calc/DurationCalc';
+import MilitaryCalc from './calc/MilitaryCalc';
+import DecimalCalc from './calc/DecimalCalc';
+import OvertimeCalc from './calc/OvertimeCalc';
+import PayCalc from './calc/PayCalc';
+import DateCalc from './calc/DateCalc';
+import PtoCalc from './calc/PtoCalc';
+import { route } from '../i18n/routes';
+import { P, RULES, RULE_OPTIONS } from '../lib/data';
+import type { ToolKind } from '../lib/page-types';
+interface Props { kind: ToolKind; state?: string; lock?: boolean; idPrefix?: string; methodHref?: string }
+const { kind, state = 'federal', lock = false, idPrefix, methodHref = route('method', 'en') } = Astro.props;
+const rules = RULES as never;
+const pre = idPrefix ?? kind.slice(0, 4);
+const otModes = ['overtime', 'time-and-a-half', 'double-time', 'regular-rate', 'salaried-ot'];
+const payModes = ['salary-to-hourly', 'hourly-to-salary', 'hourly-rate', 'biweekly-pay'];
+const dateModes = ['pay-schedule', 'pay-periods', 'business-days', 'working-days', 'days-between', 'weeks-between', 'date-add'];
+---
+{(kind === 'timecard' || kind === 'timesheet') && <TimeCard client:load rules={rules} options={RULE_OPTIONS} state={state} lock={lock} weeks={kind === 'timesheet' ? 2 : 1} methodHref={methodHref} idPrefix={pre} />}
+{(kind === 'hours' || kind === 'clock-in-out') && <HoursCalc client:load mode={kind} methodHref={methodHref} idPrefix={pre} />}
+{kind === 'work-hours' && <WorkHoursCalc client:load methodHref={methodHref} idPrefix={pre} />}
+{kind === 'time-sum' && <TimeSumCalc client:load methodHref={methodHref} idPrefix={pre} />}
+{kind === 'time-clock' && <PunchCalc client:load methodHref={methodHref} idPrefix={pre} />}
+{kind === 'duration' && <DurationCalc client:load methodHref={methodHref} idPrefix={pre} />}
+{kind === 'military' && <MilitaryCalc client:load methodHref={methodHref} idPrefix={pre} />}
+{(kind === 'hm-decimal' || kind === 'payroll-hours') && <DecimalCalc client:load mode={kind} methodHref={methodHref} idPrefix={pre} />}
+{otModes.includes(kind) && <OvertimeCalc client:load mode={kind as never} rules={rules} options={RULE_OPTIONS} state={state} lock={lock} methodHref={methodHref} idPrefix={pre} />}
+{payModes.includes(kind) && <PayCalc client:load mode={kind as never} divisor={P.federal.opmHourlyDivisor} threshold={P.federal.exemptSalaryWeekly} methodHref={methodHref} idPrefix={pre} />}
+{dateModes.includes(kind) && <DateCalc client:load mode={kind as never} methodHref={methodHref} idPrefix={pre} />}
+{(kind === 'pto' || kind === 'pto-accrual' || kind === 'ca-sick') && <PtoCalc client:load mode={kind} caSick={P.states.california.sickLeave} methodHref={methodHref} idPrefix={pre} />}

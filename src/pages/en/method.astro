@@ -1,0 +1,54 @@
+---
+/** Method: how a shift is measured, rounded, split into overtime, and how calendars are built. Figures from the kit. */
+import PageLayout from '../../layouts/PageLayout.astro';
+import { route } from '../../i18n/routes';
+import { KIT as K } from '../../lib/kit';
+import { SOURCES, table } from '../../lib/helpers';
+import { breadcrumbSchema, webPageSchema } from '../../lib/seo';
+const lang = 'en';
+const path = route('method', lang);
+const title = 'Time card method 2026: how hours and overtime are counted';
+const description = 'How Hours Ledger counts a time card in 2026: shift length, unpaid breaks, 785.48 rounding, FLSA and state daily overtime, regular rate, holidays and paydays.';
+const cases: Array<[string, number[], 'federal' | 'california' | 'alaska' | 'nevada' | 'colorado', number]> = [
+  ['Five 9-hour days, FLSA', [9, 9, 9, 9, 9, 0, 0], 'federal', 20],
+  ['Same week, California', [9, 9, 9, 9, 9, 0, 0], 'california', 20],
+  ['One 13-hour day, California', [13, 0, 0, 0, 0, 0, 0], 'california', 20],
+  ['Seven days 8, 8, 8, 8, 8, 4, 10, California', [8, 8, 8, 8, 8, 4, 10], 'california', 20],
+  ['Ten-hour day, Nevada at $15', [10, 0, 0, 0, 0, 0, 0], 'nevada', 15],
+  ['Ten-hour day, Nevada at $25', [10, 0, 0, 0, 0, 0, 0], 'nevada', 25],
+  ['Three 14-hour days, Colorado', [14, 14, 14, 0, 0, 0, 0], 'colorado', 20],
+];
+const rows = cases.map(([l, h, k, r]) => { const w = K.week(h, k, r); return [l, K.hrs(w.total), K.hrs(w.reg), K.hrs(w.ot), K.hrs(w.dt), K.usd(w.pay.total, 2)]; });
+const src = (k: string, t?: string) => `<a href="${SOURCES[k].url}" target="_blank" rel="nofollow noopener noreferrer">${t ?? SOURCES[k].label}</a>`;
+---
+<PageLayout title={title} description={description} lang={lang} jsonLd={[webPageSchema({ name: 'How the hours are counted', description, path, lang }), breadcrumbSchema([{ name: 'Home', path: route('home', lang) }, { name: 'Method', path }])]} breadcrumbs={[{ label: 'Method' }]}>
+  <article class="prose prose-slate max-w-none prose-headings:font-serif">
+    <h1>How the hours are counted</h1>
+    <p>Every calculator on this site runs the same small engine in your browser. This page describes it in the order it works, with the official text behind each step. All thresholds sit in one parameter file read on {K.day(K.P.retrieved_at)}; the tests that guard the engine reproduce the examples the agencies publish.</p>
+    <h2>1. Reading a time</h2>
+    <p>A typed time is turned into minutes after midnight. "8", "830", "8:30" and "8.30" are all half past eight; "am" and "pm" are read when present, and without them the 24-hour clock is used, so "1730" is 5:30 pm. Anything else is refused and the field turns amber, rather than counting as zero.</p>
+    <h2>2. Measuring a shift</h2>
+    <p>The shift is the out time minus the in time. When the out time is earlier than or equal to the in time, it belongs to the next day, which is how a night shift from 10 pm to 6 am gives eight hours. The unpaid break is subtracted next. The site treats as unpaid only what you type in the break field, and its labels follow the federal rules: rest periods of about {K.P.hoursWorked.restPaidMinMinutes} to {K.P.hoursWorked.restPaidMaxMinutes} minutes count as hours worked (<Fragment set:html={src('cfr_785_18', '29 CFR 785.18')} />), a bona fide meal period during which you are completely relieved of duty, ordinarily 30 minutes or more, does not (<Fragment set:html={src('cfr_785_19', '29 CFR 785.19')} />).</p>
+    <h2>3. Rounding punches</h2>
+    <p>When rounding is chosen, each punch is moved to the nearest 5 minutes, 6 minutes (a tenth of an hour) or 15 minutes, and the shift is measured between the rounded punches. These are the three increments named in <Fragment set:html={src('cfr_785_48', '29 CFR 785.48(b)')} />, which accepts the practice only if it does not, over time, underpay the work actually done. On the quarter hour, a punch 7 minutes past rounds down and one 8 minutes past rounds up. The calculator never rounds the total of the day or the week, because the rule is about recorded starting and stopping times.</p>
+    <h2>4. Splitting the workweek</h2>
+    <p>Hours are first split day by day under the daily rule of the chosen state, then week by week. In California hours past {K.ca.dailyOtAfter} in a workday are time and a half and hours past {K.ca.dailyDtAfter} are double time; when an employee works all seven days of the workweek, the first {K.ca.seventhDayOtUpTo} hours of the seventh are time and a half and the rest double time (<Fragment set:html={src('ca_overtime', 'DLSE overtime FAQ')} />). Alaska counts after {K.ak.dailyOtAfter} hours a day for employers of {K.ak.employersFrom} or more (<Fragment set:html={src('ak_wage_hour', 'Alaska Wage and Hour Act')} />). Nevada counts after {K.nv.dailyOtAfter} hours only for employees paid less than {K.num(K.nv.dailyOtOnlyBelowMultipleOfMinimum, 1)} times its minimum wage of {K.usd(K.nv.minimumWage, 2)}, that is under {K.usd(K.nvDailyLimit, 2)} an hour (<Fragment set:html={src('dol_state_table', 'DOL state table')} />). Colorado counts after {K.co.dailyOtAfter} hours a day or {K.co.consecutiveOtAfter} consecutive hours (<Fragment set:html={src('co_comps40', 'COMPS Order #40, Rule 4')} />).</p>
+    <p>The weekly step then walks through the days in workweek order and counts only the hours still at straight time. When they pass {K.F.weeklyOvertimeAfter}, each further straight-time hour becomes overtime (<Fragment set:html={src('dol_fs23', 'Fact Sheet #23')} />). Because an hour already paid as daily overtime is never counted again, this gives exactly the "whichever is greater" result that Colorado's Rule 4.1.2 asks for, and the usual California payroll practice. Seven reference weeks, computed by the engine at the rate shown:</p>
+    <Fragment set:html={table(['Case', 'Total', 'Regular', 'Overtime', 'Double', 'Gross'], rows, 'Reference cases of the overtime engine (also run as automated tests).', ['l', 'r', 'r', 'r', 'r', 'r'])} />
+    <h2>5. The regular rate</h2>
+    <p>Overtime multiplies the regular rate, not only the base wage. With two rates in one week the calculator follows <Fragment set:html={src('cfr_778_115', '29 CFR 778.115')} />: total straight-time pay divided by all hours, then half of that rate added for each overtime hour. For a nonexempt employee paid a weekly salary meant to cover all hours, the Department of Labor's own example is reproduced: {K.usd(405)} for 45 hours gives a regular rate of {K.usd(9, 2)} and {K.usd(22.5, 2)} of extra half-time.</p>
+    <h2>6. Calendars and paydays</h2>
+    <p>Federal holidays are computed from their legal rules (fixed dates, or the nth Monday or Thursday of a month) with the weekend rule that <Fragment set:html={src('opm_holidays', 'OPM')} /> applies: a Saturday holiday is observed on Friday, a Sunday holiday on Monday. The computed 2026 list is checked against OPM's published list in the tests. Business days are weekdays that are not observed federal holidays. Biweekly paydays repeat every 14 days from any payday you give; semimonthly ones fall on the 15th and the last day of the month, and when a payday lands on a weekend or holiday the calculators move it to the previous business day, a common policy that you can switch off.</p>
+    <h2>7. Salary, hourly rate and PTO</h2>
+    <p>Salary to hourly divides by the hours actually scheduled (40 hours over 52 weeks is 2,080) and shows the federal civilian method, which divides annual basic pay by {K.num(K.F.opmHourlyDivisor)} hours, the average number of paid hours in a year over a 28-year cycle (<Fragment set:html={src('opm_2087', 'OPM, 5 U.S.C. 5504(b)')} />). PTO accrual is plain arithmetic on your employer's policy; for California sick leave the engine uses the Labor Commissioner's figures: one hour for every {K.ca.sickLeave.accrueOneHourPer} hours worked, use of at least {K.ca.sickLeave.useAtLeastHours} hours or {K.ca.sickLeave.useAtLeastDays} days a year, and an accrual cap that may not be lower than {K.ca.sickLeave.accrualCapHours} hours or {K.ca.sickLeave.accrualCapDays} days (<Fragment set:html={src('ca_sick_leave', 'DLSE paid sick leave')} />).</p>
+    <h2>8. What the engine does not model</h2>
+    <ul>
+      <li>Exemptions: the calculators assume a nonexempt employee. Executive, administrative, professional and many industry exemptions are not tested.</li>
+      <li>Alternative workweek schedules in California and flexible work hour plans in Alaska, which move the daily threshold.</li>
+      <li>Meal and rest period premiums owed when a break is missed; the breaks guide explains them but the time card does not add them.</li>
+      <li>Local minimum wages and city ordinances, union contracts, tips and tip credits, taxes and deductions.</li>
+      <li>Daylight saving time: clock times are used as written, so a night shift across the change counts one hour more or less than the real elapsed time.</li>
+    </ul>
+    <p>Found an error? The <a href={route('contact', lang)}>contact page</a> says what to send. The publisher and its sources are presented on the <a href={route('about', lang)}>about page</a>.</p>
+  </article>
+</PageLayout>

@@ -1,0 +1,13 @@
+{
+ "accent": "#3C3B6E",
+ "symbol": "HRS",
+ "variants": [
+  {
+   "file": "og-en.png",
+   "title": "Time card, overtime\nand 2026 pay periods",
+   "subtitle": "Breaks · rounding · CA, AK, NV, CO daily overtime",
+   "badge": "FLSA · state rules read 2026",
+   "brand": "Hours Ledger"
+  }
+ ]
+}

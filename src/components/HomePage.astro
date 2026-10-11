@@ -1,0 +1,62 @@
+---
+/**
+ * Home, in its own order for this subject: the weekly time card first (the head query is "time card
+ * calculator"), the folded answer, the five overtime rule sets side by side, the 2026 payday ledger,
+ * the questions people bring (a definition list of tasks), then the long text in accordions and the FAQ.
+ * Text: src/content/home.ts.
+ */
+import PageLayout from '../layouts/PageLayout.astro';
+import Clamp from './Clamp.astro';
+import Tool from './Tool.astro';
+import { HOME } from '../content/home';
+import { route } from '../i18n/routes';
+import { GROUPS } from '../i18n/nav';
+import { helpers, SOURCES, table } from '../lib/helpers';
+import { PAGES } from '../lib/pages';
+import { KIT as K } from '../lib/kit';
+import { day } from '../lib/fmt';
+import { faqSchema, organizationSchema, websiteSchema, webPageSchema, webApplicationSchema } from '../lib/seo';
+import { LAST_UPDATED } from '../data/site-config';
+const lang = 'en';
+const x = HOME;
+const path = route('home', lang);
+const h = helpers();
+const sources = x.sources.map((k) => ({ name: SOURCES[k].label, url: SOURCES[k].url }));
+const jsonLd = [websiteSchema(lang), organizationSchema(lang), webPageSchema({ name: x.h1, description: x.description, path, lang }), webApplicationSchema({ name: x.h1, description: x.description, path, lang }), faqSchema(x.faqs, lang)];
+const sections = x.sections(h);
+const yes = (b: boolean) => (b ? 'yes' : 'no');
+const ruleRows = K.ruleKeys.map((k) => { const r = K.rules[k]; const link = k === 'federal' ? h.a('overtime-calculator', 'Federal (FLSA)') : h.a(`${k}-overtime`, r.name); return [link, r.dailyOtAfter ? `${r.dailyOtAfter} h${k === 'nevada' ? `, if paid under ${K.usd(K.nvDailyLimit, 2)}/h` : ''}` : 'none', r.dailyDtAfter ? `${r.dailyDtAfter} h` : 'none', `${r.weeklyOtAfter} h`, yes(r.seventhDay)]; });
+const payRows = [['2026-01-01', 'Thursday'], ['2026-01-02', 'Friday'], ['2026-01-08', 'Thursday'], ['2026-01-09', 'Friday']].map(([d, w]) => { const raw = K.cal.paydays(2026, 'biweekly', d, false); return [`${w}, ${day(d)}`, String(raw.length), day(raw[raw.length - 1])]; });
+---
+<PageLayout title={x.title} description={x.description} lang={lang} jsonLd={jsonLd} faqs={x.faqs} sources={sources}>
+  <div class="mb-4 border-b-2 border-accent-600 pb-4">
+    <h1 class="font-serif text-3xl font-bold text-navy-900 md:text-4xl">{x.h1}</h1>
+    <p class="mt-2 text-lg text-navy-700">{x.intro}</p>
+    <p class="mt-2 text-sm text-navy-600">Rules read on the official texts <time datetime={LAST_UPDATED}>{day(LAST_UPDATED)}</time> · <a href={route('method', lang)} class="underline">How the hours are counted</a> · <a href={route('about', lang)} class="underline">Who publishes this</a></p>
+  </div>
+  <div data-outil><Tool kind="timecard" idPrefix="home" /></div>
+  <Clamp text={x.resume} lang={lang} id="clamp-home" class="my-8" />
+  <section class="prose prose-slate max-w-none prose-headings:font-serif">
+    <h2>{x.rulesTitle}</h2>
+    <Fragment set:html={x.rulesIntro(h)} />
+    <Fragment set:html={table(['Rule set', 'Daily overtime after', 'Double time after', 'Weekly overtime after', 'Seventh day'], ruleRows, 'Thresholds applied by the time card when you pick a state. Sources: DOL state table (July 1, 2026), DLSE, Alaska DOLWD, COMPS Order #40.', ['l', 'l', 'l', 'l', 'l'])} />
+    <h2>{x.paydayTitle}</h2>
+    <Fragment set:html={x.paydayIntro(h)} />
+    <Fragment set:html={table(['First biweekly payday', 'Paydays in 2026', 'Last one'], payRows, 'Unadjusted calendar dates, every 14 days from the first payday of January 2026.', ['l', 'r', 'l'])} />
+  </section>
+  <section class="mt-10" data-chrome>
+    <h2 class="font-serif text-2xl font-bold text-navy-900">{x.tasksTitle}</h2>
+    <dl class="mt-4 divide-y divide-navy-200 border-y border-navy-200">
+      {GROUPS.map((g) => (
+        <div class="grid gap-2 py-4 md:grid-cols-[14rem_1fr]">
+          <dt class="font-serif text-lg font-semibold text-navy-900">{g.label}</dt>
+          <dd class="flex flex-wrap gap-x-5 gap-y-2 text-sm">{PAGES.filter((p) => p.group === g.id).map((p) => <a href={route(p.id, lang)} class="font-medium text-accent-700 underline underline-offset-2 hover:text-navy-900" title={p.card}>{p.nav}</a>)}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+  <section class="mt-10">
+    <h2 class="font-serif text-2xl font-bold text-navy-900">{x.foldTitle}</h2>
+    {sections.map((s) => <details class="fold"><summary><h3 class="fold-h">{s.title}</h3></summary><div class="prose prose-slate max-w-none pb-4"><Fragment set:html={s.html} /></div></details>)}
+  </section>
+</PageLayout>

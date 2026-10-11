@@ -1,0 +1,30 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import LegalIdentity from '../../components/LegalIdentity.astro';
+import { route } from '../../i18n/routes';
+import { AUTHOR_NAME, AUTHOR_DESC, CONTACT_EMAIL, LAST_UPDATED } from '../../data/site-config';
+import { KIT as K } from '../../lib/kit';
+import { profilePageSchema, breadcrumbSchema } from '../../lib/seo';
+const lang = 'en';
+const path = route('about', lang);
+const title = 'Hours Ledger 2026: who builds the time card and how';
+const description = 'Hours Ledger is published by Radif Partners: free 2026 time card, overtime and payday calculators built on the FLSA, state wage laws and OPM calendars.';
+---
+<PageLayout title={title} description={description} lang={lang} jsonLd={[profilePageSchema({ path, lang }), breadcrumbSchema([{ name: 'Home', path: route('home', lang) }, { name: 'About', path }])]} breadcrumbs={[{ label: 'About' }]}>
+  <article class="prose prose-slate max-w-none prose-headings:font-serif">
+    <h1>About Hours Ledger</h1>
+    <p>{AUTHOR_DESC.en}</p>
+    <h2>Why this site exists</h2>
+    <p>The first results for "time card calculator" either stop at a column of hours or use the column as bait for payroll software, with overtime "based on your state's rules" reserved for the paid version. This site does better than the first Google result because its calculator does not stop at the total: it rounds punches the way 29 CFR 785.48 allows, takes off unpaid meal periods under the federal hours-worked rules, applies the daily overtime of California, Alaska, Nevada and Colorado from the 2026 texts it cites, and gives the gross pay ready to print, without an account and without selling anything.</p>
+    <h2>Who publishes it</h2>
+    <p>Hours Ledger is published by {AUTHOR_NAME}, a company that builds calculators on public rules and data. It is not a payroll provider, a staffing agency, a law firm or a government office, and it has no commercial tie with any time-clock or HR software vendor. There is no advertising on the site today.</p>
+    <LegalIdentity lang={lang} />
+    <h2>What the calculators rely on</h2>
+    <p>Federal rules come from the Fair Labor Standards Act as the Department of Labor explains it in Fact Sheets #22 and #23, and from Title 29 of the Code of Federal Regulations: Part 785 for hours worked, breaks and rounding, Part 778 for the regular rate. State rules come from the agencies that enforce them: the California Labor Commissioner for Labor Code 510 and the meal, rest and sick leave rules, the Alaska Department of Labor and Workforce Development, Colorado's COMPS Order #40 in force since {K.day(K.co.compsEffective)}, and the Department of Labor's state table for Nevada's daily rule. Calendars use the federal holiday list of the Office of Personnel Management.</p>
+    <p>Every one of these figures sits in a single parameter file, each with the source it was read on and the date. The engine is tested against the examples the agencies publish themselves, such as the {K.usd(405)} salaried worker of Fact Sheet #23 whose regular rate for a 45-hour week is {K.usd(9, 2)}.</p>
+    <h2>What we will not do</h2>
+    <p>We do not tell anyone whether they are exempt, whether an employer broke the law or how much a claim is worth. We do not publish rules we could not read in an official text: when a state page says nothing about a detail, it is because we did not find it stated by the agency. We do not collect the times you type; they stay in your browser.</p>
+    <h2>Contact</h2>
+    <p>Corrections and questions about a rule: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> or the <a href={route('contact', lang)}>contact page</a>. The <a href={route('method', lang)}>method page</a> shows how each number is produced and the <a href={route('editorial', lang)}>editorial policy</a> how errors are fixed. Last review: {K.day(LAST_UPDATED)}.</p>
+  </article>
+</PageLayout>

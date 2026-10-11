@@ -1,0 +1,19 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { route } from '../../i18n/routes';
+import { AUTHOR_NAME, REVIEW_CYCLE_MONTHS } from '../../data/site-config';
+const lang = 'en';
+---
+<PageLayout title="Editorial policy of Hours Ledger: legal sources, updates, fixes" description="How Hours Ledger reads wage-hour rules, writes its pages and fixes mistakes: federal and state texts only, every threshold in one parameter file, tested examples." lang={lang} noindex={true} breadcrumbs={[{ label: 'Editorial policy' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none prose-headings:font-serif">
+    <h1>Editorial policy</h1>
+    <h2>Sources we accept</h2>
+    <p>Federal rules come from the statute, the Code of Federal Regulations and the Department of Labor's fact sheets; state rules from the agency that enforces them (California Labor Commissioner, Alaska Department of Labor and Workforce Development, Colorado Division of Labor Standards and Statistics) or, when the state site cannot be read, the Department of Labor's state table. Calendars use the Office of Personnel Management. HR software blogs and law firm marketing pages are not sources here.</p>
+    <h2>How a page is written</h2>
+    <p>No threshold is typed into a page by hand: every hour limit, multiplier, minimum wage or holiday date is read from one parameter file, so that a change in a state rule updates every page and every calculator that uses it. Worked examples on the pages are computed by the same engine as the calculators. Each page lists its legal sources at the bottom with the date they were read.</p>
+    <h2>Independence</h2>
+    <p>{AUTHOR_NAME} receives nothing from payroll, time-clock or HR software vendors, staffing firms or law firms. The site runs no advertising today. If advertising is ever added, it will be marked as such and kept away from the calculators.</p>
+    <h2>Updates and corrections</h2>
+    <p>The whole site is reviewed at least every {REVIEW_CYCLE_MONTHS} months, and earlier when a rule changes: state minimum wages each January and July, Colorado's yearly COMPS Order, federal salary levels, the OPM holiday list for the next year. Reported errors are checked against the source; when a figure was wrong, it is corrected and the date at the top of the page changes. Write through the <a href={route('contact', lang)}>contact page</a>. The method is on the <a href={route('method', lang)}>method page</a>.</p>
+  </div>
+</PageLayout>

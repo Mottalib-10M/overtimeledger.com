@@ -1,0 +1,11 @@
+---
+/** Every calculator and guide page (src/content/pages/). */
+import ContentPage from '../../components/ContentPage.astro';
+import { PAGES } from '../../lib/pages';
+import type { PageDef } from '../../lib/page-types';
+export function getStaticPaths() {
+  return PAGES.map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+const { page } = Astro.props as { page: PageDef };
+---
+<ContentPage page={page} />
