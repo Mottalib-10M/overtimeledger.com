@@ -1,6 +1,6 @@
 /** Configuration centrale du site (générée par new-site.py). */
-export const SITE_URL = "https://us-work-hours.example";
-export const SITE_NAMES: Record<string, string> = {"en": "Hours Ledger"};
+export const SITE_URL = "https://overtimeledger.com";
+export const SITE_NAMES: Record<string, string> = {"en": "Overtime Ledger"};
 export const LANG_TAGS: Record<string, string> = {"en": "en-US"};
 export const OG_LOCALES: Record<string, string> = {"en": "en_US"};
 export const LOCALE_TAG = 'en-US';
@@ -16,7 +16,7 @@ export const AUTHOR_DESC: Record<string, string> = {"en": "Radif Partners writes
  *  themes reellement traites par le site, pas une liste de mots-cles : un sujet
  *  declare ici sans page qui le couvre est une declaration fausse. */
 export const KNOWS_ABOUT: Record<string, string[]> = {"en": ["Time card and timesheet calculation", "FLSA overtime and the regular rate", "California, Alaska, Nevada and Colorado daily overtime", "Hours worked, meal and rest periods, time-clock rounding", "Biweekly pay periods and 2026 payroll calendars", "Salary to hourly conversion and PTO accrual"]};
-export const CONTACT_EMAIL = "contact@us-work-hours.example";
+export const CONTACT_EMAIL = "contact@overtimeledger.com";
 export const THEME_COLOR = '#3C3B6E';
 export const LOGO_SYMBOL = 'HRS';
 export const BING_VERIFY_CODE = '';

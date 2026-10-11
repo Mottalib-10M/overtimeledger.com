@@ -8,7 +8,7 @@ import { breadcrumbSchema, webPageSchema } from '../../lib/seo';
 const lang = 'en';
 const path = route('method', lang);
 const title = 'Time card method 2026: how hours and overtime are counted';
-const description = 'How Hours Ledger counts a time card in 2026: shift length, unpaid breaks, 785.48 rounding, FLSA and state daily overtime, regular rate, holidays and paydays.';
+const description = 'How Overtime Ledger counts a time card in 2026: shift length, unpaid breaks, 785.48 rounding, FLSA and state daily overtime, regular rate, holidays and paydays.';
 const cases: Array<[string, number[], 'federal' | 'california' | 'alaska' | 'nevada' | 'colorado', number]> = [
   ['Five 9-hour days, FLSA', [9, 9, 9, 9, 9, 0, 0], 'federal', 20],
   ['Same week, California', [9, 9, 9, 9, 9, 0, 0], 'california', 20],

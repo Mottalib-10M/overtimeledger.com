@@ -1,6 +1,6 @@
 {
- "name": "Hours Ledger",
- "short_name": "Hours Ledger",
+ "name": "Overtime Ledger",
+ "short_name": "Overtime Ledger",
  "description": "Weekly time card with breaks, quarter-hour rounding and overtime by state (FLSA, California, Alaska, Nevada, Colorado), plus 2026 pay periods and work days.",
  "start_url": "/en/",
  "display": "standalone",

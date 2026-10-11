@@ -6,9 +6,9 @@ import { route } from '../../i18n/routes';
 import { contactPageSchema } from '../../lib/seo';
 const lang = 'en';
 const path = route('contact', lang);
-const description = 'Write to the publisher of Hours Ledger about an overtime rule, a source or a calculator result. We check rules against the official text; we do not give legal advice on a wage claim.';
+const description = 'Write to the publisher of Overtime Ledger about an overtime rule, a source or a calculator result. We check rules against the official text; we do not give legal advice on a wage claim.';
 ---
-<PageLayout title="Contact Hours Ledger: rule corrections, sources and embed questions" description={description} lang={lang} noindex={true} jsonLd={[contactPageSchema({ name: 'Contact', description, path, lang })]} breadcrumbs={[{ label: 'Contact' }]} showAuthor={false}>
+<PageLayout title="Contact Overtime Ledger: rule corrections, sources and embed questions" description={description} lang={lang} noindex={true} jsonLd={[contactPageSchema({ name: 'Contact', description, path, lang })]} breadcrumbs={[{ label: 'Contact' }]} showAuthor={false}>
   <div class="prose prose-slate max-w-none prose-headings:font-serif">
     <h1>Contact</h1>
     <p>E-mail: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. There is no form on purpose: your hours and pay are your business, and an e-mail lets you choose what to share.</p>

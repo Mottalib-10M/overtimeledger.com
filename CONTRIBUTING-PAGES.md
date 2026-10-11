@@ -1,4 +1,4 @@
-# Écrire ou étoffer une page de « Hours Ledger » (us-work-hours)
+# Écrire ou étoffer une page de « Overtime Ledger » (overtimeledger.com)
 
 Notice pour les agents qui écrivent ou prolongent le site. À lire en entier avant d'écrire, avec
 `~/Documents/GitHub/RECETTE-SITE.md` (§0, §6, §6.5, §7, §9, §9.3, §11, §17.4, §21, §26).
@@ -70,7 +70,7 @@ Anglais américain, voix humaine, phrases de longueur variable, le chiffre d'abo
 ## Contrôles (tous à 0)
 
 ```bash
-cd ~/Documents/GitHub/a-publier/Mottalib-10M/us-work-hours
+cd ~/Documents/GitHub/a-publier/Mottalib-10M/overtimeledger.com
 export NODE_PATH=$(npm root -g):$PWD/node_modules
 PAGE_FILES=<id> npx vitest run tests/pages.test.ts   # une fiche seule
 npm run build                                          # inclut typo-nbsp et check-snippets (bloquant)
