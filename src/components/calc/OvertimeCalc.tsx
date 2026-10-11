@@ -6,7 +6,7 @@ import SelectField from '../ui/SelectField';
 import { splitWeek, grossPay, type StateRule } from '../../lib/engine/overtime';
 import { weightedOvertime, salariedHalfTime } from '../../lib/engine/pay';
 import { readParams, num as qn, str, updateURL } from '../../lib/url-state';
-import { Card, Result, Rows, Note, Actions, SplitBar, SPLIT_COLORS, usd, num, type Opt } from './parts';
+import { Shell, Card, Result, Rows, Note, Actions, SplitBar, SPLIT_COLORS, usd, num, type Opt } from './parts';
 
 type Mode = 'overtime' | 'time-and-a-half' | 'double-time' | 'regular-rate' | 'salaried-ot';
 interface Props { mode?: Mode; rules: Record<string, StateRule>; options: Opt[]; state?: string; lock?: boolean; methodHref?: string; idPrefix?: string }
@@ -26,7 +26,7 @@ export default function OvertimeCalc({ mode = 'overtime', rules, options, state 
   if (mode === 'overtime') {
     const pay = grossPay(split, rate);
     return (
-      <div className="rechner rounded-xl border border-navy-200 bg-white p-4 sm:p-6">
+      <Shell left={<>
         <form className="grid gap-x-5 gap-y-4 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>
           {lock
             ? <div className="grid grid-rows-subgrid row-span-3 content-start gap-y-0"><span className="mb-1 block text-sm font-medium text-navy-700">Overtime rule</span><p className="flex h-12 items-center rounded-lg border border-navy-200 bg-navy-50 px-4 font-semibold text-navy-900">{rules[st].name}</p><span className="mt-1 text-xs text-navy-500">Fixed on this page</span></div>
@@ -36,13 +36,14 @@ export default function OvertimeCalc({ mode = 'overtime', rules, options, state 
         <form className="mt-4 grid grid-cols-4 gap-x-3 gap-y-3 sm:grid-cols-7" onSubmit={(e) => e.preventDefault()}>
           {hours.map((hh, i) => <NumberField key={i} id={`${p}-d${i}`} label={DAYS[i]} value={hh} onChange={(v) => setHours((a) => a.map((q, j) => (j === i ? v : q)))} unit="h" max={24} decimals={2} />)}
         </form>
+        </>}>
         <Result label="Overtime pay this week" figure={usd(pay.ot + pay.dt, 2)} sub={<>{num(split.ot, 2)} h at 1.5x{split.dt > 0 ? `, ${num(split.dt, 2)} h at 2x` : ''} · gross {usd(pay.total, 2)}</>}>
           <SplitBar parts={[{ label: 'Regular', value: split.reg, color: SPLIT_COLORS.reg }, { label: 'Overtime', value: split.ot, color: SPLIT_COLORS.ot }, { label: 'Double time', value: split.dt, color: SPLIT_COLORS.dt }]} />
           <Rows rows={[['Total hours', `${num(split.total, 2)} h`], ['Regular hours', `${num(split.reg, 2)} h × ${usd(rate, 2)}`], ['Overtime hours', `${num(split.ot, 2)} h × ${usd(rate * 1.5, 2)}`], ...(split.dt > 0 || rules[st].dailyDtAfter ? [['Double-time hours', `${num(split.dt, 2)} h × ${usd(rate * 2, 2)}`] as [string, string]] : []), ['Gross pay before taxes', usd(pay.total, 2), true]]} />
           <Note methodHref={methodHref}>{split.note}{split.seventhDayApplied ? ' Seventh consecutive day: first 8 hours at 1.5x, the rest at 2x.' : ''} Days are in workweek order.</Note>
           <Actions />
         </Result>
-      </div>
+      </Shell>
     );
   }
   if (mode === 'time-and-a-half' || mode === 'double-time') {

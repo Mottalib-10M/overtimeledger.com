@@ -1,5 +1,5 @@
 /** Shared pieces of the calculators: card, result box, ledger rows, actions, time input. */
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import SelectField from '../ui/SelectField';
 import { formatMoney, formatNumber } from '../../lib/format';
 
@@ -7,12 +7,22 @@ export const usd = (n: number, d = 0) => formatMoney(Number.isFinite(n) ? n : 0,
 export const num = (n: number, d = 0) => formatNumber(Number.isFinite(n) ? n : 0, d);
 export interface Opt { value: string; label: string }
 
+/**
+ * Frame of every calculator (RECETTE §5, rule of 2026-10-11: the calculator is seen without scrolling).
+ * From 1024 px: the fields on the left, the result beside them on the right, both in the first screen.
+ */
+export function Shell({ left, children }: { left: ReactNode; children: ReactNode }) {
+  return (
+    <div className="rechner rounded-xl border border-navy-200 bg-white p-4 sm:p-6 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-start lg:gap-x-8">
+      <div className="min-w-0">{left}</div>
+      <div className="min-w-0 lg:sticky lg:top-20">{children}</div>
+    </div>
+  );
+}
+
 export function Card({ children, form }: { children: ReactNode; form: ReactNode }) {
   return (
-    <div className="rechner rounded-xl border border-navy-200 bg-white p-4 sm:p-6">
-      <form className="grid gap-x-5 gap-y-4 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>{form}</form>
-      {children}
-    </div>
+    <Shell left={<form className="grid gap-x-5 gap-y-4 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>{form}</form>}>{children}</Shell>
   );
 }
 
@@ -29,12 +39,32 @@ export function StatePick({ id, value, onChange, states, lock, label = 'State', 
 }
 
 export function Result({ label, figure, sub, children }: { label: string; figure: string; sub?: ReactNode; children?: ReactNode }) {
+  // On a phone the result can sit below a long form: while the calculator is on screen and its result
+  // is not, a bar pinned to the bottom repeats the key figure (RECETTE §5, rule of 2026-10-11).
+  const ref = useRef<HTMLDivElement>(null);
+  const [bar, setBar] = useState(false);
+  useEffect(() => {
+    const box = ref.current; const calc = box?.closest('.rechner');
+    if (!box || !calc || typeof IntersectionObserver === 'undefined') return;
+    let calcIn = false, boxIn = false;
+    const upd = () => setBar(calcIn && !boxIn && window.innerWidth < 1024);
+    const io = new IntersectionObserver((es) => { for (const e of es) { if (e.target === box) boxIn = e.isIntersecting; else calcIn = e.isIntersecting; } upd(); });
+    io.observe(box); io.observe(calc);
+    window.addEventListener('resize', upd);
+    return () => { io.disconnect(); window.removeEventListener('resize', upd); };
+  }, []);
   return (
-    <div aria-live="polite" className="mt-6 rounded-xl bg-accent-50 p-4 sm:p-5">
+    <div ref={ref} data-resultat aria-live="polite" className="mt-6 rounded-xl bg-accent-50 p-4 sm:p-5 lg:mt-0">
       <p className="text-sm font-medium text-navy-700">{label}</p>
       <p className="tabular-nums mt-1 text-4xl font-bold text-navy-900">{figure}</p>
       {sub && <p className="ledger-range mt-1 text-sm">{sub}</p>}
       {children}
+      {bar && (
+        <div aria-hidden="true" onClick={() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="fixed inset-x-0 bottom-0 z-40 flex cursor-pointer items-baseline justify-between gap-3 border-t border-navy-200 bg-white px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] lg:hidden">
+          <span className="truncate text-sm font-medium text-navy-700">{label}</span>
+          <span className="tabular-nums shrink-0 text-2xl font-bold text-navy-900">{figure}</span>
+        </div>
+      )}
     </div>
   );
 }

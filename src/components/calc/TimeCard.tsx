@@ -9,7 +9,7 @@ import SelectField from '../ui/SelectField';
 import { parseClock, shiftMinutes, to12h } from '../../lib/engine/time';
 import { splitWeek, grossPay, type StateRule } from '../../lib/engine/overtime';
 import { readParams, num as qn, str, updateURL } from '../../lib/url-state';
-import { Result, Rows, Note, Actions, SplitBar, SPLIT_COLORS, usd, num, hmd, type Opt } from './parts';
+import { Shell, Result, Rows, Note, Actions, SplitBar, SPLIT_COLORS, usd, num, hmd, type Opt } from './parts';
 
 interface Row { i: string; o: string; b: string }
 interface Props { rules: Record<string, StateRule>; options: Opt[]; state?: string; lock?: boolean; weeks?: 1 | 2; methodHref?: string; idPrefix?: string }
@@ -58,7 +58,7 @@ export default function TimeCard({ rules, options, state = 'federal', lock = fal
   const dayName = (k: number) => DAYS[(+start + k) % 7];
   const minutes = Math.round(calc.tot.total * 60);
   return (
-    <div className="rechner rounded-xl border border-navy-200 bg-white p-4 sm:p-6">
+    <Shell left={<>
       <form className="grid gap-x-5 gap-y-4 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>
         {lock
           ? <div className="grid grid-rows-subgrid row-span-3 content-start gap-y-0"><span className="mb-1 block text-sm font-medium text-navy-700">Overtime rule</span><p className="flex h-12 items-center rounded-lg border border-navy-200 bg-navy-50 px-4 font-semibold text-navy-900">{rules[st].name}</p><span className="mt-1 text-xs text-navy-500">Fixed on this page</span></div>
@@ -81,6 +81,17 @@ export default function TimeCard({ rules, options, state = 'federal', lock = fal
         ))}
         <p className="mt-2 text-xs text-navy-600">Type 8, 830, 8:30, 2:15pm or 14:15. An out time earlier than the in time is read as the next morning (night shift). Paid rest breaks of 5 to 20 minutes are not deducted.</p>
       </div>
+      <div className="mt-6 overflow-x-auto">
+        <table className="w-full min-w-[30rem] text-sm">
+          <thead><tr className="border-b border-navy-300 text-left text-xs uppercase tracking-wide text-navy-600"><th scope="col" className="py-1.5 pr-2">Day</th><th scope="col" className="py-1.5 pr-2">Counted shift</th><th scope="col" className="py-1.5 pr-2 text-right">Hours</th><th scope="col" className="py-1.5 pr-2 text-right">Reg</th><th scope="col" className="py-1.5 pr-2 text-right">OT</th><th scope="col" className="py-1.5 text-right">DT</th></tr></thead>
+          <tbody className="divide-y divide-navy-200">
+            {calc.shifts.map((s, k) => { const d = calc.wk[Math.floor(k / 7)].days[k % 7]; return (
+              <tr key={k}><td className="py-1.5 pr-2 text-navy-800">{dayName(k)}</td><td className="py-1.5 pr-2 text-navy-700">{s.minutes > 0 && s.inR !== null && s.outR !== null ? `${to12h(s.inR)} to ${to12h(s.outR)}${s.overnight ? ' (+1 day)' : ''}${s.b ? `, ${s.b} min off` : ''}` : '·'}</td><td className="tabular-nums py-1.5 pr-2 text-right text-navy-900">{hmd(s.minutes)}</td><td className="tabular-nums py-1.5 pr-2 text-right">{num(d.reg, 2)}</td><td className="tabular-nums py-1.5 pr-2 text-right">{num(d.ot, 2)}</td><td className="tabular-nums py-1.5 text-right">{num(d.dt, 2)}</td></tr>
+            ); })}
+          </tbody>
+        </table>
+      </div>
+      </>}>
       <Result label={weeks === 2 ? 'Hours worked in the two weeks' : 'Hours worked this week'} figure={`${hmd(minutes)}`} sub={<>{num(calc.tot.total, 2)} decimal hours{rate > 0 ? <> · gross pay {usd(calc.pay.total, 2)}</> : null}</>}>
         <SplitBar parts={[{ label: 'Regular', value: calc.tot.reg, color: SPLIT_COLORS.reg }, { label: 'Overtime 1.5x', value: calc.tot.ot, color: SPLIT_COLORS.ot }, { label: 'Double time 2x', value: calc.tot.dt, color: SPLIT_COLORS.dt }]} />
         <Rows rows={[
@@ -89,19 +100,9 @@ export default function TimeCard({ rules, options, state = 'federal', lock = fal
           ...(calc.tot.dt > 0 || calc.rule.dailyDtAfter ? [['Double time at 2x', `${num(calc.tot.dt, 2)} h`] as [string, string]] : []),
           ...(rate > 0 ? [['Regular pay', usd(calc.pay.reg, 2)], ['Overtime pay', usd(calc.pay.ot + calc.pay.dt, 2)], ['Gross pay before taxes', usd(calc.pay.total, 2), true]] as Array<[string, string] | [string, string, boolean]> : []),
         ]} />
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[30rem] text-sm">
-            <thead><tr className="border-b border-navy-300 text-left text-xs uppercase tracking-wide text-navy-600"><th scope="col" className="py-1.5 pr-2">Day</th><th scope="col" className="py-1.5 pr-2">Counted shift</th><th scope="col" className="py-1.5 pr-2 text-right">Hours</th><th scope="col" className="py-1.5 pr-2 text-right">Reg</th><th scope="col" className="py-1.5 pr-2 text-right">OT</th><th scope="col" className="py-1.5 text-right">DT</th></tr></thead>
-            <tbody className="divide-y divide-navy-200">
-              {calc.shifts.map((s, k) => { const d = calc.wk[Math.floor(k / 7)].days[k % 7]; return (
-                <tr key={k}><td className="py-1.5 pr-2 text-navy-800">{dayName(k)}</td><td className="py-1.5 pr-2 text-navy-700">{s.minutes > 0 && s.inR !== null && s.outR !== null ? `${to12h(s.inR)} to ${to12h(s.outR)}${s.overnight ? ' (+1 day)' : ''}${s.b ? `, ${s.b} min off` : ''}` : '·'}</td><td className="tabular-nums py-1.5 pr-2 text-right text-navy-900">{hmd(s.minutes)}</td><td className="tabular-nums py-1.5 pr-2 text-right">{num(d.reg, 2)}</td><td className="tabular-nums py-1.5 pr-2 text-right">{num(d.ot, 2)}</td><td className="tabular-nums py-1.5 text-right">{num(d.dt, 2)}</td></tr>
-              ); })}
-            </tbody>
-          </table>
-        </div>
         <Note methodHref={methodHref}>{calc.wk.map((w) => w.note).filter((x, i, a) => a.indexOf(x) === i).join(' ')}{calc.wk.some((w) => w.seventhDayApplied) ? ' Seven consecutive days worked: the seventh day is paid at overtime rates.' : ''}</Note>
         <Actions />
       </Result>
-    </div>
+    </Shell>
   );
 }

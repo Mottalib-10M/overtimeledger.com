@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import NumberField from '../ui/NumberField';
 import SelectField from '../ui/SelectField';
 import { readParams, num as qn, str, updateURL } from '../../lib/url-state';
-import { Card, Result, Rows, Note, Actions, usd, num } from './parts';
+import { Shell, Card, Result, Rows, Note, Actions, usd, num } from './parts';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 export default function DecimalCalc({ mode = 'hm-decimal', methodHref = '/en/method/', idPrefix = 'dc' }: { mode?: 'hm-decimal' | 'payroll-hours'; methodHref?: string; idPrefix?: string }) {
@@ -35,7 +35,7 @@ export default function DecimalCalc({ mode = 'hm-decimal', methodHref = '/en/met
   const exact = w.reduce((s, [a, b]) => s + a + b / 60, 0);
   const set = (i: number, k: 0 | 1) => (v: number) => setW((x) => x.map((y, j) => (j === i ? (k === 0 ? [v, y[1]] : [y[0], v]) : y)));
   return (
-    <div className="rechner rounded-xl border border-navy-200 bg-white p-4 sm:p-6">
+    <Shell left={<>
       <form className="grid grid-cols-2 gap-x-3 gap-y-3 sm:grid-cols-4" onSubmit={(e) => e.preventDefault()}>
         {w.map((x, i) => [
           <NumberField key={`h${i}`} id={`${p}-h${i}`} label={`${DAYS[i]} hours`} value={x[0]} onChange={set(i, 0)} unit="h" max={24} />,
@@ -44,11 +44,12 @@ export default function DecimalCalc({ mode = 'hm-decimal', methodHref = '/en/met
         <SelectField id={`${p}-rd`} label="Payroll writes each day to" value={round} onChange={setRound} options={[{ value: '2', label: 'Hundredths (0.01 h)' }, { value: '1', label: 'Tenths (0.1 h)' }, { value: '25', label: 'Quarters (0.25 h)' }]} className="col-span-2" />
         <NumberField id={`${p}-r`} label="Hourly rate (optional)" value={rate} onChange={setRate} unit="$/h" max={1000} decimals={2} className="col-span-2" />
       </form>
+      </>}>
       <Result label="Decimal hours for payroll" figure={num(total, 2)} sub={<>{num(exact, 4)} h exactly · difference {num((total - exact) * 60, 1)} min</>}>
         <Rows rows={[...days.map((x, i) => [DAYS[i], num(x, 2)] as [string, string]), ...(rate > 0 ? [['Straight-time pay', usd(total * rate, 2), true] as [string, string, boolean]] : [])]} />
         <Note methodHref={methodHref}>Rounding a daily total is a payroll convention, not a rule; over time it must not shortchange the worker (29 CFR 785.48).</Note>
         <Actions />
       </Result>
-    </div>
+    </Shell>
   );
 }

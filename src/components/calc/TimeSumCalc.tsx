@@ -4,7 +4,7 @@ import NumberField from '../ui/NumberField';
 import SelectField from '../ui/SelectField';
 import { sumDurations, splitSeconds } from '../../lib/engine/time';
 import { readParams, str, updateURL } from '../../lib/url-state';
-import { Result, Rows, Note, Actions, num } from './parts';
+import { Shell, Result, Rows, Note, Actions, num } from './parts';
 
 type L = { h: number; m: number; s: number; sign: 1 | -1 };
 const DEF: L[] = [{ h: 7, m: 45, s: 0, sign: 1 }, { h: 8, m: 20, s: 0, sign: 1 }, { h: 0, m: 30, s: 0, sign: -1 }, { h: 0, m: 0, s: 0, sign: 1 }];
@@ -16,7 +16,7 @@ export default function TimeSumCalc({ methodHref = '/en/method/', idPrefix = 'ts
   const t = splitSeconds(sumDurations(lines));
   const p = idPrefix;
   return (
-    <div className="rechner rounded-xl border border-navy-200 bg-white p-4 sm:p-6">
+    <Shell left={<>
       <form onSubmit={(e) => e.preventDefault()}>
         {lines.map((l, i) => (
           <div key={i} className="mb-3 grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-4">
@@ -27,11 +27,12 @@ export default function TimeSumCalc({ methodHref = '/en/method/', idPrefix = 'ts
           </div>
         ))}
       </form>
+      </>}>
       <Result label="Total" figure={`${t.neg ? '−' : ''}${t.h}:${String(t.m).padStart(2, '0')}:${String(t.s).padStart(2, '0')}`} sub={<>{t.neg ? '−' : ''}{t.h} h {t.m} min {t.s} s</>}>
         <Rows rows={[['Decimal hours', `${num(t.decimal, 4)} h`], ['Total minutes', `${num(t.decimal * 60, 2)} min`], ['Total seconds', num(t.decimal * 3600)]]} />
         <Note methodHref={methodHref}>Minutes and seconds above 59 carry over: 90 minutes count as 1:30:00.</Note>
         <Actions />
       </Result>
-    </div>
+    </Shell>
   );
 }
