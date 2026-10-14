@@ -19,7 +19,7 @@ export default function PunchCalc({ methodHref = '/en/method/', idPrefix = 'pc' 
   const p = idPrefix;
   return (
     <Shell left={<>
-      <form className="grid gap-x-5 gap-y-4 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>
+      <form className="grid content-start gap-x-5 gap-y-4 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>
         {pairs.map((x, i) => [
           <TimeInput key={`a${i}`} id={`${p}-a${i}`} label={`In #${i + 1}`} value={x[0]} onChange={set(i, 0)} placeholder={i === 2 ? 'optional' : '8:00'} invalid={x[0].trim() !== '' && res[i].ia === null} />,
           <TimeInput key={`b${i}`} id={`${p}-b${i}`} label={`Out #${i + 1}`} value={x[1]} onChange={set(i, 1)} placeholder={i === 2 ? 'optional' : '12:00'} invalid={x[1].trim() !== '' && res[i].ib === null} />,

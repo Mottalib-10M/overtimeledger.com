@@ -59,7 +59,7 @@ export default function TimeCard({ rules, options, state = 'federal', lock = fal
   const minutes = Math.round(calc.tot.total * 60);
   return (
     <Shell left={<>
-      <form className="grid gap-x-5 gap-y-4 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>
+      <form className="grid content-start gap-x-5 gap-y-4 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>
         {lock
           ? <div className="grid grid-rows-subgrid row-span-3 content-start gap-y-0"><span className="mb-1 block text-sm font-medium text-navy-700">Overtime rule</span><p className="flex h-12 items-center rounded-lg border border-navy-200 bg-navy-50 px-4 font-semibold text-navy-900">{rules[st].name}</p><span className="mt-1 text-xs text-navy-500">Fixed on this page</span></div>
           : <SelectField id={`${p}-st`} label="State where you work" value={st} onChange={setSt} options={options} help="Sets the daily and weekly overtime thresholds" />}

@@ -22,7 +22,7 @@ export function Shell({ left, children }: { left: ReactNode; children: ReactNode
 
 export function Card({ children, form }: { children: ReactNode; form: ReactNode }) {
   return (
-    <Shell left={<form className="grid gap-x-5 gap-y-4 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>{form}</form>}>{children}</Shell>
+    <Shell left={<form className="grid content-start gap-x-5 gap-y-4 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>{form}</form>}>{children}</Shell>
   );
 }
 

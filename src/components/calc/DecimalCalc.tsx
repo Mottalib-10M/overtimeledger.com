@@ -36,7 +36,7 @@ export default function DecimalCalc({ mode = 'hm-decimal', methodHref = '/en/met
   const set = (i: number, k: 0 | 1) => (v: number) => setW((x) => x.map((y, j) => (j === i ? (k === 0 ? [v, y[1]] : [y[0], v]) : y)));
   return (
     <Shell left={<>
-      <form className="grid grid-cols-2 gap-x-3 gap-y-3 sm:grid-cols-4" onSubmit={(e) => e.preventDefault()}>
+      <form className="grid content-start grid-cols-2 gap-x-3 gap-y-3 sm:grid-cols-4" onSubmit={(e) => e.preventDefault()}>
         {w.map((x, i) => [
           <NumberField key={`h${i}`} id={`${p}-h${i}`} label={`${DAYS[i]} hours`} value={x[0]} onChange={set(i, 0)} unit="h" max={24} />,
           <NumberField key={`m${i}`} id={`${p}-m${i}`} label={`${DAYS[i]} minutes`} value={x[1]} onChange={set(i, 1)} unit="min" max={59} />,

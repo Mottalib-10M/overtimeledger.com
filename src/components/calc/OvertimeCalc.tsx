@@ -27,13 +27,13 @@ export default function OvertimeCalc({ mode = 'overtime', rules, options, state 
     const pay = grossPay(split, rate);
     return (
       <Shell left={<>
-        <form className="grid gap-x-5 gap-y-4 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>
+        <form className="grid content-start gap-x-5 gap-y-4 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>
           {lock
             ? <div className="grid grid-rows-subgrid row-span-3 content-start gap-y-0"><span className="mb-1 block text-sm font-medium text-navy-700">Overtime rule</span><p className="flex h-12 items-center rounded-lg border border-navy-200 bg-navy-50 px-4 font-semibold text-navy-900">{rules[st].name}</p><span className="mt-1 text-xs text-navy-500">Fixed on this page</span></div>
             : <SelectField id={`${p}-st`} label="State where you work" value={st} onChange={setSt} options={options} />}
           <NumberField id={`${p}-r`} label="Regular hourly rate" value={rate} onChange={setRate} unit="$/h" max={1000} decimals={2} />
         </form>
-        <form className="mt-4 grid grid-cols-4 gap-x-3 gap-y-3 sm:grid-cols-7" onSubmit={(e) => e.preventDefault()}>
+        <form className="mt-4 grid content-start grid-cols-4 gap-x-3 gap-y-3 sm:grid-cols-7" onSubmit={(e) => e.preventDefault()}>
           {hours.map((hh, i) => <NumberField key={i} id={`${p}-d${i}`} label={DAYS[i]} value={hh} onChange={(v) => setHours((a) => a.map((q, j) => (j === i ? v : q)))} unit="h" max={24} decimals={2} />)}
         </form>
         </>}>
