@@ -32,7 +32,7 @@ const payRows = [['2026-01-01', 'Thursday'], ['2026-01-02', 'Friday'], ['2026-01
   <div class="mb-4 border-b-2 border-accent-600 pb-4">
     <h1 class="font-serif text-3xl font-bold text-navy-900 md:text-4xl">{x.h1}</h1>
     <p class="mt-2 text-lg text-navy-700">{x.intro}</p>
-    <p class="mt-2 text-sm text-navy-600">Rules read on the official texts <time datetime={LAST_UPDATED}>{day(LAST_UPDATED)}</time> · <a href={route('method', lang)} class="underline">How the hours are counted</a> · <a href={route('about', lang)} class="underline">Who publishes this</a></p>
+    <p class="mt-2 text-sm text-navy-600"><a href={route('method', lang)} class="underline">How the hours are counted</a> · <a href={route('about', lang)} class="underline">Who publishes this</a></p>
   </div>
   <div data-outil><Tool kind="timecard" idPrefix="home" /></div>
   <Clamp text={x.resume} lang={lang} id="clamp-home" class="my-8" />
